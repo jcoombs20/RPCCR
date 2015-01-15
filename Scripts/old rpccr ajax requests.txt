@@ -1,0 +1,195 @@
+function ajax1() {
+	//*******Get rid values
+
+	input = {"layer": rpccrSFLayer, "id_field": uniqueID[rpccrSFNum], "oid": oid};
+
+	tmpProgress.innerHTML = "Acquiring rid values";
+	stepCnt += 1;
+	tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+
+	$.ajax({url:"http://localhost:3412/get_rid", 
+		type:"POST", 
+		success:function(data,status) {
+			//alert(data + "\n" + status);
+			tmpData = JSON.parse(data);
+			rid = [];
+			for (var i=0; i<tmpData.length; i++) {
+				rid.push({"rid": tmpData[i].rid});
+				}
+			input = {"layer": rpccrSFLayer, "id_field": uniqueID[rpccrSFNum], "oid": oid, "rid": rid, "solgain": document.getElementById("solGainInp").value};
+			tmpProgress.innerHTML = "Calculating solar gain percentile value";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax2();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});
+	}
+
+function ajax2() {
+	//*******Get solar gain percentile value
+	$.ajax({url:"http://localhost:3412/solar_gain_percentile", 
+		type:"POST", 
+		success:function(data,status) {
+			//alert(data + "\n" + status);
+			tmpData = JSON.parse(data);
+			solgainval = tmpData.value;
+
+			input = {"layer": rpccrSFLayer, "id_field": uniqueID[rpccrSFNum], "oid": oid, "rid": rid, "solgain": document.getElementById("solGainInp").value, "solgainval": solgainval, "cancov": document.getElementById("canInp").value, "impsur": document.getElementById("impSurInp").value, "impsuruse": document.getElementById("impSurCheck").checked, "file_name": file_name};
+			tmpProgress.innerHTML = "Outputting map algebra function to GeoTIFF file";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax3();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});
+	}
+
+function ajax3() {
+	//*******Perform map algebra and output tif file
+	$.ajax({url:"http://localhost:3412/map_algebra", 
+		type:"POST", 
+		success:function(data,status) {
+			//alert(data + "\n" + status);
+			rpccr_file_name.push(file_name);
+			input = {"ws":"rpccr", "cs": cs_id, "file": file_loc, "style":"rpccr_style"};
+			tmpProgress.innerHTML = "Verifying Workspace";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax4();
+			},
+		error:function(xhr,status,error) {
+			//alert(status + "\n" + error);
+			//rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		//complete: interval_on(),
+		async:true});
+	}
+
+function ajax4() {
+	//*****Verify or add workspace
+	$.ajax({url:"http://localhost:3412/add_ws",
+		type:"POST",
+		crossDomain: true,
+		success:function(data,status) {
+			tmpProgress.innerHTML = "Creating Coverage Store";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax5();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});
+	}
+
+function ajax5() {
+	//*****Add coverage store
+	$.ajax({url:"http://localhost:3412/add_cs",
+		type:"POST",
+		crossDomain: true,
+		success:function(data2,status2) {
+			tmpProgress.innerHTML = "Adding Coverage";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax6();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});	
+	}
+
+function ajax6() {
+	//*****Add coverage
+	$.ajax({url:"http://localhost:3412/add_coverage",
+		type:"POST",
+		crossDomain: true,
+		success:function(data3,status3) {
+			tmpProgress.innerHTML = "Verifying Style";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax7();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});	
+	}
+
+function ajax7() {
+	//*****Verify or Add style
+	$.ajax({url:"http://localhost:3412/add_style",
+		type:"POST",
+		crossDomain: true,
+		success:function(data4,status4) {
+			tmpProgress.innerHTML = "Assigning Style";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			ajax8();
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});	
+	}
+
+function ajax8() {
+	//*****Change style
+	$.ajax({url:"http://localhost:3412/change_style",
+		type:"POST",
+		crossDomain: true,
+		success:function(data5,status5) {
+			tmpProgress.innerHTML = "Adding Layer to Map";
+			stepCnt += 1;
+			tmpStatus.style.width = Math.round((stepCnt/steps)*100) + "%";
+			rpccr_id.push(cs_id);
+			rpccr_count = rpccrLayers[rpccrLayers.length];
+			rpccrLayers[rpccr_count] = new OpenLayers.Layer.WMS( cs_id,
+ 				"http://localhost/geoserver/rpccr/wms", 
+				{layers: cs_id, format: "image/png", transparent: true} 
+				);
+			layerVar.push(rpccrLayers[rpccr_count]);
+			layerNS.push("rpccr:" + cs_id);
+			layerType.push("raster");
+			legSpec.push("none");
+			map.addLayer(rpccrLayers[rpccr_count]);
+			x = map.getNumLayers();
+			map.setLayerIndex(rpccrLayers[rpccr_count],x-3);
+			rpccrLayers[rpccr_count].setVisibility(true);
+			createLegend();
+			zoomToLayer(x-3,1);
+			rpccr_visual(0);
+			},
+		error:function(xhr,status,error) {
+			alert(status + "\n" + error);
+			rpccr_visual(0);
+			},
+		data:input,
+		dataType:"text",
+		async:true});	
+	}

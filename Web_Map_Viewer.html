@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Brook Trout Integrated Spatial Data and Tools (EBTST)</title>
+		<link rel="shortcut icon" href="Images/AppLCC.ico">
+		<link rel="icon" type="image/ico" href="Images/AppLCC.ico">
+		<link rel="stylesheet" href="Styles/Map_Viewer_Styles.css" type="text/css">  
+		<script src="OpenLayers/OpenLayers.js"></script>
+		<script defer="defer" src="Scripts/Map_Viewer.js"></script>
+		<script id="layerSwitcher" src="Scripts/Layer_Switcher.js"></script>
+		<script src="Scripts/Map_Controls.js"></script>
+		<script src="Scripts/riparian_planting_tool.js"></script>
+		<script src="Scripts/drain_area_tool.js"></script>
+		<script src="Scripts/proj4.js"></script>
+		<script src="Scripts/jquery-1.10.2.js"></script>
+		<script src="Scripts/jquery-ui-1.10.3-min.js"></script>
+		<script src="Scripts/ajax.js"></script>
+		<script src="Scripts/socket_emit.js"></script>
+		<script src="http://felek.cns.umass.edu:3412/socket.io/socket.io.js"></script>
+		<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+	</head>
+  
+	<body id="body" onload="init()" onresize="mapSize()">
+		<div id="legend"></div>
+		<div id="panelContainer">
+			<div id="controlPanel"></div>
+		</div>
+		<div id="mapViewer"></div>
+		<div id="noScript">
+			<noscript>
+	 			For full functionality of this site it is necessary to enable JavaScript.
+				 Here are the <a href="http://www.enable-javascript.com/" target="_blank">
+	 			instructions how to enable JavaScript in your web browser</a>.
+			</noscript>
+		</div>
+		<div id="measures">
+			<div id="scale-id"></div>
+			<div id="scaleline-id"></div>
+			<div id="location">Location</div>
+		</div>
+		<div id="opacity"></div>
+		<div id="coords"></div>
+		<div id="idLayerList"></div>
+		<div id="selLayerList"></div>
+		<div id="download"></div>
+		<div id="riparian"></div>
+		<div id="get_feature"></div>
+		<div id="rpccr_background"></div>
+		<div id="rpccr_status"></div>
+		<div id="drain_area"></div>
+		<div id="show_area"></div>
+		<div id="tool_info"></div>
+		<div id="stats_info"></div>
+	</body>
+</html>
