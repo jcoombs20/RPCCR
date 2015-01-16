@@ -742,7 +742,7 @@ function init() {
 		vector.removeAllFeatures();
 		});
 
-	goCoords = new OpenLayers.Control.Button({id: "coordsButton", title: "Zoom to specified coordinates", displayClass: "olControlCoords", trigger: goToCoords});
+	goCoords = new OpenLayers.Control.Button({id: "coordsButton", title: "Zoom to specified address or coordinates", displayClass: "olControlCoords", trigger: goToCoords});
 	navHistory = new OpenLayers.Control.NavigationHistory({id: "navHistory", displayClass: "olControlNavHist"});
 	navHistory.previous.title = "Previous Extent";
 	navHistory.next.title = "Next Extent";

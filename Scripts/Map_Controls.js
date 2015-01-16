@@ -832,6 +832,63 @@ function goToCoords() {
 		coordsBar = document.createElement("hr");
 		coordsDiv.appendChild(coordsBar);
 
+		geoLabel = document.createElement("label");
+		geoLabel.innerHTML = "Search Type:";
+		geoLabel.style.margin = "5px";
+		coordsDiv.appendChild(geoLabel);
+
+		geoType = document.createElement("select");
+		geoType.multiple = false;
+		geoType.name = "geoSel";
+		geoType.id = "geoType";
+		geoType.setAttribute("onclick", "searchType(geoType.selectedIndex)");
+		geoType.style.margin = "5px";
+		for (var i=0; i<6; i++) {
+			geoTypeOpt = document.createElement("option");
+			geoTypeOpt.value = i;
+			geoTypeOpt.id = "geoTypeOpt" + i;
+			switch(i) {
+				case 0:
+ 					geoTypeOpt.innerHTML = "Address";
+  					break;
+				case 1:
+ 					geoTypeOpt.innerHTML = "Coordinates";
+  					break;
+				}
+			geoType.appendChild(geoTypeOpt);
+			}
+		coordsDiv.appendChild(geoType);
+		geoType.selectedIndex = 0;
+
+		breakP = document.createElement("p");
+		breakP.innerHTML = "<br>";
+		breakP.style.margin = "0px";
+		coordsDiv.appendChild(breakP);
+
+		addressLabel = document.createElement("label");
+		addressLabel.innerHTML = "Address:";
+		addressLabel.style.margin = "5px";
+		coordsDiv.appendChild(addressLabel);
+		
+		addressInp = document.createElement("input");
+		addressInp.setAttribute("type", "text");
+		addressInp.id = "addressInp";
+		addressInp.name = "addressInp";
+		addressInp.onkeydown = function(event) {
+			if (event.keyCode == 13) {
+				mapCoords(geoType.selectedIndex);
+				}
+			}
+		addressInp.style.margin = "5px";
+		addressInp.style.width = "232px";
+		coordsDiv.appendChild(addressInp);
+
+		breakP = document.createElement("p");
+		breakP.id = "addressBreak";
+		breakP.innerHTML = "<br>";
+		breakP.style.margin = "0px";
+		coordsDiv.appendChild(breakP);
+
 		longLabel = document.createElement("label");
 		longLabel.innerHTML = "Long:";
 		longLabel.style.margin = "5px";
@@ -841,6 +898,11 @@ function goToCoords() {
 		longInp.setAttribute("type", "text");
 		longInp.id = "longInp";
 		longInp.name = "longInp";
+		longInp.onkeydown = function(event) {
+			if (event.keyCode == 13) {
+				mapCoords(geoType.selectedIndex);
+				}
+			}
 		longInp.style.margin = "5px";
 		longInp.style.width = "100px";
 		coordsDiv.appendChild(longInp);
@@ -854,11 +916,17 @@ function goToCoords() {
 		latInp.setAttribute("type", "text");
 		latInp.id = "latInp";
 		latInp.name = "latInp";
+		latInp.onkeydown = function(event) {
+			if (event.keyCode == 13) {
+				mapCoords(geoType.selectedIndex);
+				}
+			}
 		latInp.style.margin = "5px";
 		latInp.style.width = "100px";
 		coordsDiv.appendChild(latInp);
 
 		breakP = document.createElement("p");
+		breakP.id = "coordsBreak";
 		breakP.innerHTML = "<br>";
 		breakP.style.margin = "0px";
 		coordsDiv.appendChild(breakP);
@@ -882,7 +950,7 @@ function goToCoords() {
 			coordsScale.appendChild(scaleOpt);
 			}
 		coordsDiv.appendChild(coordsScale);
-		coordsScale.selectedIndex = 0;
+		coordsScale.selectedIndex = Math.round(tmpScale.length/2);
 		//scaleLabel.style.marginLeft = (coordsDiv.offsetWidth + coordsScale.offsetWidth - scaleLabel.offsetWidth) / 2 + "px";
 		//coordsScale.style.marginLeft = (coordsDiv.offsetWidth - coordsScale.offsetWidth + scaleLabel.offsetWidth) / 2 + "px";
 
@@ -892,33 +960,14 @@ function goToCoords() {
 		coordsDiv.appendChild(breakP);
 
 		coordsBut = document.createElement("button");
-		coordsBut.setAttribute("onclick", "mapCoords()");
+		coordsBut.setAttribute("onclick", "mapCoords(geoType.selectedIndex)");
 		coordsBut.innerHTML = "Map Location";
 		coordsBut.style.height = "auto";
 		coordsBut.style.width = "auto";
 		coordsBut.style.marginBottom = "5px";
 		coordsDiv.appendChild(coordsBut);
-
+		
 		coordsBut.style.marginLeft = (coordsDiv.offsetWidth - coordsBut.offsetWidth) / 2 + "px";
-
-		/*tmpGeo = document.createElement("input");
-		tmpGeo.setAttribute("type", "text");
-		tmpGeo.id = "tmpGeo";
-		tmpGeo.name = "tmpGeo";
-		tmpGeo.style.margin = "5px";
-		tmpGeo.style.width = "100px";
-		coordsDiv.appendChild(tmpGeo);
-
-		geoBut = document.createElement("button");
-		geoBut.setAttribute("onclick", "google(tmpGeo.value");
-		geoBut.innerHTML = "Geocode Location";
-		geoBut.style.height = "auto";
-		geoBut.style.width = "auto";
-		geoBut.style.marginBottom = "5px";
-		coordsDiv.appendChild(geoBut);
-
-		geoBut.style.marginLeft = (coordsDiv.offsetWidth - geoBut.offsetWidth) / 2 + "px";
-		*/
 		}
 
 	panel = document.getElementById("controlPanel");
@@ -933,12 +982,94 @@ function goToCoords() {
 	if (coordsDiv.offsetLeft + coordsDiv.offsetWidth > w) {
 		coordsDiv.style.left = w - coordsDiv.offsetWidth + "px";
 		}
+	searchType(geoType.selectedIndex)
 	coordsDiv.style.visibility = "visible";
 	}
 
-function mapCoords() {
+function searchType(searchInd) {
+	if (searchInd == 0) {
+		addressLabel.style.display = "inline";
+		addressInp.style.display = "inline";
+		document.getElementById("addressBreak").style.display = "inline";
+		longLabel.style.display = "none";
+		longInp.style.display = "none";
+		latLabel.style.display = "none";
+		latInp.style.display = "none";
+		document.getElementById("coordsBreak").style.display = "none";
+		}
+	else {
+		addressLabel.style.display = "none";
+		addressInp.style.display = "none";
+		document.getElementById("addressBreak").style.display = "none";
+		longLabel.style.display = "inline";
+		longInp.style.display = "inline";
+		latLabel.style.display = "inline";
+		latInp.style.display = "inline";
+		document.getElementById("coordsBreak").style.display = "inline";
+		}
+	}		
+
+function mapCoords(tmpType) {
 	gotoLong = document.getElementById("longInp");
 	gotoLat = document.getElementById("latInp");
+	tmpBi = 0;
+
+	if (tmpType == 0) {  //Address option
+		addStr = addressInp.value;
+		addStr.replace(" ", "+");
+			
+		$.ajax({url:"http://maps.googleapis.com/maps/api/geocode/json?address=" + addStr, 
+			type:"GET", 
+			success:function(data,status) {
+				tmpData = JSON.parse(data);
+				if (tmpData.status == "OK") {
+					gotoLong.value = tmpData.results[0].geometry.location.lng;
+					gotoLat.value = tmpData.results[0].geometry.location.lat;
+					tmpAddress = tmpData.results[0].formatted_address;
+					}
+				else {
+					alert("The following problem occurred with your search: " + tmpData.status + ".\n\nPlease alter your specified address.");
+					tmpBi = 1;
+					return;
+					}
+				}, 
+			error:function(xhr,status,error) {
+				alert(status + "\n" + error);
+				tmpBi = 1;
+				return;
+				},
+			//data:input,
+			dataType:"text",
+			async:false
+			});
+		}
+	else {			//lat, long option
+		latlng = gotoLat.value + "," + gotoLong.value;
+			
+		$.ajax({url:"http://maps.googleapis.com/maps/api/geocode/json?latlng=" + latlng, 
+			type:"GET", 
+			success:function(data,status) {
+				tmpData = JSON.parse(data);
+				if (tmpData.status == "OK") {
+					tmpAddress = tmpData.results[0].formatted_address;
+					}
+				else {
+					tmpAddress = tmpData.status;
+					}
+				}, 
+			error:function(xhr,status,error) {
+				alert(status + "\n" + error);
+				tmpBi = 1;
+				return;
+				},
+			//data:input,
+			dataType:"text",
+			async:false
+			});
+		}
+	if (tmpBi == 1) {
+		return;
+		}
 
 	if (gotoLong.value == "" || gotoLat.value == "" || isNaN(gotoLong.value) == true || isNaN(gotoLat.value) == true) {
 		alert("Please enter coordinates in decimal degrees.");
@@ -959,7 +1090,12 @@ function mapCoords() {
 	gotoPoint.lon = parseFloat(DDPointTArray[0]);
 	gotoPoint.lat = parseFloat(DDPointTArray[1]);
 
-	gotoPopup = new OpenLayers.Popup.FramedCloud("gotoPopup", gotoPoint, new OpenLayers.Size(50,50), gotoLong.value + " W<br>" + gotoLat.value + " N", null, true);
+	if (tmpType == 0) {
+		gotoPopup = new OpenLayers.Popup.FramedCloud("gotoPopup", gotoPoint, new OpenLayers.Size(50,50), tmpAddress + "<br>" + gotoLong.value + ", " + gotoLat.value, null, true);
+		}
+	else {
+		gotoPopup = new OpenLayers.Popup.FramedCloud("gotoPopup", gotoPoint, new OpenLayers.Size(50,50), tmpAddress + "<br>" + gotoLong.value + ", " + gotoLat.value, null, true);
+		}
 	map.addPopup(gotoPopup, true);
 	map.setCenter(gotoPoint,document.getElementById("coordsScale").selectedIndex, false, false);
 
